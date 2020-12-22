@@ -9,6 +9,9 @@ const usersRouter = require('./routes/users');
 
 const app = express();
 
+const {verification} = require('./lib/verification');
+const common = require('./lib/common');
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
@@ -18,6 +21,15 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+
+app.all('/*', verification, (req, res, next) => {
+    // res.header("Access-Control-Allow-Origin", "*");
+    // res.header("Access-Control-Allow-Origin", "http://localhost:3005");
+    // res.header("Access-Control-Allow-Methods","POST, PUT, GET, DELETE, OPTIONS");
+    // res.header("Access-Control-Max-Age","360000");
+    // res.header("Access-Control-Allow-Headers", "Origin, Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers, Authorization");
+    next();
+})
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
@@ -38,13 +50,5 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
-const PORT = (process.env.NODE_ENV == 'production') ? process.env.PORT : process.env.DEVELOPMENT_PORT;
-console.log(PORT);
-app
-    .set('port', PORT)
-    .listen(app.get('port'), async () => {
-      console.log('Express started on http://localhost:' + app.get('port') + '; press');
-
-    });
 
 module.exports = app;
